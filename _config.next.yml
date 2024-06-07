@@ -1,0 +1,3 @@
+
+post_asset_folder: true # 没骗博客对应生成一个目录，方便存放图片
+pjax: true
