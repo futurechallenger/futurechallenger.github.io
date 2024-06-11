@@ -35,12 +35,89 @@ Flutter 的动画系统围绕着“动画对象”这一概念，即一个随时
 ##### Tween(补间动画）
 
 这个动画是Flutter的基本动画。补间动画，顾名思义了就是在两个值之间插值，然后让一个widget动起来。如下图：
-
+![img.png](img.png)
 
 初始的状态是我们有一个背景色为蓝色的方形的widget，现在要最终让这个widget变为橘色。突然间的变色会让这个过程看起来很突兀，现在要突出丝滑的变色过程。显然，这个变色的过程如果需要开发者手动
 一帧一帧的设置颜色是不现实的。这个情况下，我们可以使用`ColorTween`，这个类会提供两个蓝色和橘色之间的色值，这样整个动画过程就可以实现了。
 
-简而言之，一个补间动画会提供两个值之间的中间值，变化过程的中间值。比如：色值、整数值、位置等几乎所有属性。这个值不需要开发者提供，补间动画本身可以提供这些值，比如上文提到过的`ColorTween`，我们也可以自己定义`Tween<T>`。
+简而言之，一个补间动画会提供两个值之间的中间值，变化过程的中间值。比如：色值、整数值、位置等几乎所有属性。
+这个值不需要开发者提供，补间动画本身可以提供这些值，比如上文提到过的`ColorTween`，
+我们也可以自己定义`Tween<T>`。同时，动画控制器还可以控制动画是否重复：`controller.repeat()`。
+
+##### 动画控制器
+
+动画控制器，顾名思义，用来控制动画的触发、过程和停止的。
+
+然而，动画控制器的主要用处驱动动画。也就是说它会计算动画动作的下一个值，让动画在定义的范围内动起来。每个Flutter动画都至少需要
+两个基本组成：
+1. 一个动画可以生成值的范围（Tween）
+2. 一个动画控制器
+
+总结，就是Flutter动画至少需要一个`Tween`和一个`AnimationController`。
+
+**注意**：动画控制器用完了要销毁！
+```dart
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+```
+
+现在你对Flutter动画有一些基本的了解了，现在可以新建一个自己的动画了。
+
+```dart
+import 'package:flutter/material.dart';
+
+class TweenAnimationPage extends StatefulWidget {
+  const TweenAnimationPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _TweenAnimationPageState();
+}
+
+class _TweenAnimationPageState extends State<TweenAnimationPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Tween Animation"),
+      ),
+      body: Center(
+        child: Opacity(
+            opacity: _animation.value, child: const Text("Tween Animation")),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+```
+
+
 
 ### 基于物理特性的动画
 
