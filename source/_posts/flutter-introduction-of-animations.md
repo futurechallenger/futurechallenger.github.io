@@ -81,6 +81,7 @@ class _TweenAnimationPageState extends State<TweenAnimationPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  late Animation _colorAnimation;
 
   @override
   void initState() {
@@ -93,6 +94,12 @@ class _TweenAnimationPageState extends State<TweenAnimationPage>
         setState(() {});
       });
 
+    _colorAnimation =
+        ColorTween(begin: Colors.white, end: Colors.orange).animate(_controller)
+          ..addListener(() {
+            setState(() {});
+          });
+
     _controller.repeat(reverse: true);
   }
 
@@ -104,7 +111,11 @@ class _TweenAnimationPageState extends State<TweenAnimationPage>
       ),
       body: Center(
         child: Opacity(
-            opacity: _animation.value, child: const Text("Tween Animation")),
+            opacity: _animation.value,
+            child: Text(
+              "Tween Animation",
+              style: TextStyle(color: _colorAnimation.value),
+            )),
       ),
     );
   }
@@ -116,8 +127,109 @@ class _TweenAnimationPageState extends State<TweenAnimationPage>
   }
 }
 ```
+1. 这一段代码：`class _TweenAnimationPageState extends State<TweenAnimationPage>
+   with SingleTickerProviderStateMixin {`用到了Dart的**mixin**。 使用这个mixin是因为需要用到动画控制器的
+*vsync*。同时，这个mixin也提供了动画控制器计算动画插值的一些工具。
+2. 初始化和配置动画控制器。代码如下：
+```dart
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  late Animation _colorAnimation;
 
+  @override
+  void initState() {
+    super.initState();
 
+    _controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+
+    _colorAnimation =
+        ColorTween(begin: Colors.white, end: Colors.orange).animate(_controller)
+          ..addListener(() {
+            setState(() {});
+          });
+
+    _controller.repeat(reverse: true);
+  }
+```
+
+`initState()` 是构建一个widget的时候要运行的第一个方法。我们在这里初始化动画和动画控制器。
+
+在控制器中，我们给`vsync`参数传入了`this`作为参数。这是`SingleTickerProviderStateMixin` mixin提供的
+我们也把`duration`设置为2秒。
+
+接下来，动画示例会用到`Tween`。第一个是`Tween<double>`，第二个是`ColorTween`。
+1. `Tween<double>`, 这个tween会用到文本的不透明度属性。这个属性需要的是一个`double`值，所以用一个Tween的泛型
+，类型参数是double。
+2. `ColorTween`, 颜色这个就不是`double`值可以搞定的了，所以用专属的`ColorTween`来计算颜色值的变化。
+
+现在来处理动画widget。
+
+```dart
+body: Center(
+  child: Opacity(
+      opacity: _animation.value, // 1
+      child: Text(
+        "Tween Animation",
+        style: TextStyle(color: _colorAnimation.value), // 2
+      )),
+),
+```
+1. `Opacity`，的属性值需要根据动画提供的值改变，这里用`Tween<double>`的动画的值。
+2. `TextStyle`，的`color`属性也需要跟着动画改变，这里用`ColorTween`的动画的值。
+
+##### 让动画动起来
+
+让动画起来，这就需要动画控制器了。
+
+关键点就在`initState`方法的最后一行代码：`_controller.repeat(reverse: true);`。调用了动画控制器实例的`repeat`方法，并且参数为**true**，那么
+这个动画就会一直循环播放。在app运行起来之后就可以看到动画在循环播放了。
+
+但是，只是这样的话是不够的。我们都知道要让widget重绘需要用到`setState`，所以在初始化两个动画的时候可不要忘记
+添加监听器。
+```dart
+_animation = Tween<double>(begin: 0, end: 1).animate(_controller)
+      ..addListener(() {       // *
+        setState(() {});
+      });
+```
+
+给Tween实例添加监听器，监听器在监听到之后执行的就是`setState`。
+
+##### 给动画加点料--Curve
+
+为了让动画更好看，我们可以给动画加点变化的曲线 -- curve。
+
+上面的动画是线性变化的，显得很直接。这样的话对于用户来说太直接，观赏性不高。要改变这个问题就需要引入动画曲线。
+动画曲线可以改变动画的线性变化，让动画有时快一点，有时慢一点，这样看起来更好。
+
+要添加动画曲线一样非常简单。增加一个`CurvedAnimation`，它在初始化的时候需要用到动画控制器。然后把这个初始化好的曲线动画放在Tween的`animate()`方法里作为参数就可以了。
+
+代码如下：
+
+```diff
+    _controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
+
++    final curvedAnimation =
++        CurvedAnimation(parent: _controller, curve: Curves.bounceInOut);
+
+-    _animation = Tween<double>(begin: 0, end: 1).animate(_controller)
++    _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation)
+      ..addListener(() {
+        setState(() {});
+      });
+
+-    _colorAnimation = ColorTween(begin: Colors.white, end: Colors.orange).animate(_controller)
++    _colorAnimation = ColorTween(begin: Colors.white, end: Colors.orange).animate(curvedAnimation)
+      ..addListener(() {
+        setState(() {});
+      });
+```
 
 ### 基于物理特性的动画
 
