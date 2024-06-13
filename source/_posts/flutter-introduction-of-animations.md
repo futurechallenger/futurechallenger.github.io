@@ -231,17 +231,11 @@ _animation = Tween<double>(begin: 0, end: 1).animate(_controller)
       });
 ```
 
-### 基于物理特性的动画
-
-Flutter 提供了模拟类用于创建具有初始状态和演化规则的基于物理的模拟。这个类使你能够创建各种各样基于物理的动画，包括那些基于弹簧动力学、摩擦力和重力的动画。
-
-让我们考虑一个在 Flutter 中基于物理的动画的例子：弹簧动画。可以使用弹簧模拟类来创建这个动画，模拟一个阻尼简谐振荡器。以下是你如何使用弹簧模拟来产生一个类似弹簧的动画：
+再来看使用曲线动画的例子。这次是使用一个曲线动画来实现弹簧的效果，模拟一个物理动画：
 
 ```dart
-// Import required packages
 import 'package:flutter/material.dart';
 
-// Define a SpringAnimation widget
 class SpringAnimation extends StatefulWidget {
   const SpringAnimation({Key? key});
 
@@ -320,7 +314,110 @@ class _SpringAnimationState extends State<SpringAnimation> with SingleTickerProv
 
 在这个例子中，`SpringAnimation` widget 使用一个`AnimationController`来驱动动画对象。一个补间动画（Tween)定义了动画的值范围，一个带有`Curves.elasticOut` 的`CurveAnimation`为动画赋予了一个类似弹性的缓动曲线。`AnimatedBuilder` widget 被用来根据动画的值来为一个容器 widget 的位置进行动画处理。`Positioned` widget 确保容器 widget 在屏幕上的位置与动画的值相关。当 widget 被构建时，`AnimationController`启动动画对象的值的动画，从而推动容器 widget 的位置动画。
 
-![alt text](image.png)
+
+
+### 基于物理特性的动画
+
+Flutter 提供了模拟类用于创建具有初始状态和演化规则的基于物理的模拟。这个类使你能够创建各种各样基于物理的动画，包括那些基于弹簧动力学、摩擦力和重力的动画。
+
+基于物理的动画还可以不沿着固定的时间线运行，这样动画的控制可以更加的灵活。在这一类的动画中可以用到的类有：
+
+- `SpringSimulation`，模拟弹簧的动画。需要在参数中指定劲度系数、阻尼和初始状态。
+```dart
+import 'package:flutter/physics.dart';
+
+final SpringDescription spring = SpringDescription(
+  mass: 1,
+  stiffness: 100,
+  damping: 1,
+);
+
+final SpringSimulation simulation = SpringSimulation(spring, 0, 1, 0);
+```
+- `GravitySimulation`，模拟物体在重力作用下的运动。
+```dart
+import 'package:flutter/physics.dart';
+
+final GravitySimulation simulation = GravitySimulation(
+  0.1, // acceleration
+  0,   // starting point
+  100, // end point
+  0,   // initial velocity
+);
+```
+- `FrictionSimulation`，模拟物体在运动中受摩擦力影响下的效果。
+```dart
+import 'package:flutter/physics.dart';
+
+final FrictionSimulation simulation = FrictionSimulation(
+  0.1, // friction coefficient
+  0,   // initial position
+  1,   // initial velocity
+);
+```
+
+让我们考虑一个在 Flutter 中基于物理的动画的例子：弹簧动画。可以使用弹簧模拟类来创建这个动画，模拟一个阻尼简谐振荡器。以下是你如何使用弹簧模拟来产生一个类似弹簧的动画：
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
+
+class PhysicsAnimationPage extends StatefulWidget {
+  const PhysicsAnimationPage({super.key});
+
+  @override
+  State<PhysicsAnimationPage> createState() => _PhysicsAnimationPageState();
+}
+
+class _PhysicsAnimationPageState extends State<PhysicsAnimationPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(vsync: this, upperBound: 500)
+      ..addListener(() {
+        setState(() {});
+      });
+
+    final simulation = SpringSimulation(
+        const SpringDescription(mass: 1, stiffness: 10, damping: 1),
+        0,
+        300,
+        10);
+
+    _controller.animateWith(simulation);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Physics Animation"),
+        ),
+        body: Stack(children: [
+          Positioned(
+            left: 50,
+            top: _controller.value,
+            height: 40,
+            width: 40,
+            child: Container(
+              color: Colors.blue,
+            ),
+          ),
+        ]));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+
+    super.dispose();
+  }
+}
+```
 
 结果是一个迷人的类似弹簧的动画，在屏幕上产生一个弹跳效果。从本质上讲，基于物理的动画为你提供了一个强大的机制，用于在你的应用程序中创造逼真和流畅的运动，而 Flutter 提供了一系列的工具和类来促进它们的实现。
 
