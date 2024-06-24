@@ -1,5 +1,5 @@
 ---
-title: flutter introduction of animations
+title: flutter动画介绍 
 date: 2024-06-08 09:17:44
 tags:
 ---
