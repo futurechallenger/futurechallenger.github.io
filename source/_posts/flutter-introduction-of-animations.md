@@ -8,9 +8,9 @@ Flutter 是一个多用途的移动应用开发框架，为开发人员配备了
 
 ### Flutter 都有哪些动画
 
-在动画领域，Flutter 提供了一系列的能力，包括基于物理特性的动画，让动画可以模仿现实世界的动态，在你的应用程序中创造出更逼真和自然的运动。
+就动画来说，Flutter 提供了一系列的工具来实现动画，包括补间动画、基于物理特性的动画，让动画可以模仿现实世界的动态，在你的应用程序中创造出更逼真和自然的运动。
 
-这篇文章会宽泛略带深度的探讨 Flutter 的动画，探索各种类型并展示如何在你的项目中实施它们。
+这篇文章会宽泛略带深度的探讨 Flutter 的动画，探索各种各样的动画类型并展示如何在你的项目中实施这些动画。
 
 #### 你需要了解
 
@@ -21,7 +21,7 @@ Flutter 是一个多用途的移动应用开发框架，为开发人员配备了
 
 ### 常用的 Flutter 动画
 
-Flutter 的动画系统围绕着“动画对象”这一概念，即一个随时间演变的值。这种演变由“动画控制器”控制，它定义了动画的持续时间、方向和其他参数。要设置一个动画，必须将这两个元素连接起来。
+Flutter 的动画系统围绕着“动画对象”这一概念，这是一个随时间演变的值。这种演变由“动画控制器”控制，它定义了动画的持续时间、方向和其他参数。要设置一个动画，必须将这两个元素连接起来。
 
 #### 常用的动画类
 
@@ -37,12 +37,9 @@ Flutter 的动画系统围绕着“动画对象”这一概念，即一个随时
 这个动画是Flutter的基本动画。补间动画，顾名思义了就是在两个值之间插值，然后让一个widget动起来。如下图：
 ![img.png](img.png)
 
-初始的状态是我们有一个背景色为蓝色的方形的widget，现在要最终让这个widget变为橘色。突然间的变色会让这个过程看起来很突兀，现在要突出丝滑的变色过程。显然，这个变色的过程如果需要开发者手动
-一帧一帧的设置颜色是不现实的。这个情况下，我们可以使用`ColorTween`，这个类会提供两个蓝色和橘色之间的色值，这样整个动画过程就可以实现了。
+初始的状态是我们有一个背景色为蓝色的方形的widget，现在要最终让这个widget变为橘色。突然间的变色会让这个过程看起来很突兀，现在要突出丝滑的变色过程。显然，这个变色的过程如果需要开发者手动一帧一帧的设置颜色是不现实的。这个情况下，我们可以使用`ColorTween`，这个类会提供两个蓝色和橘色之间的色值，这样整个动画过程就可以实现了。
 
-简而言之，一个补间动画会提供两个值之间的中间值，变化过程的中间值。比如：色值、整数值、位置等几乎所有属性。
-这个值不需要开发者提供，补间动画本身可以提供这些值，比如上文提到过的`ColorTween`，
-我们也可以自己定义`Tween<T>`。同时，动画控制器还可以控制动画是否重复：`controller.repeat()`。
+简而言之，一个补间动画会提供两个值之间的中间值，变化过程的中间值。比如：色值、整数值、位置等几乎所有属性。这个值不需要开发者提供，补间动画本身可以提供这些值，比如上文提到过的`ColorTween`，我们也可以自己定义`Tween<T>`。同时，动画控制器还可以控制动画是否重复：`controller.repeat()`。
 
 ##### 动画控制器
 
@@ -419,98 +416,181 @@ class _PhysicsAnimationPageState extends State<PhysicsAnimationPage>
 }
 ```
 
-结果是一个迷人的类似弹簧的动画，在屏幕上产生一个弹跳效果。从本质上讲，基于物理的动画为你提供了一个强大的机制，用于在你的应用程序中创造逼真和流畅的运动，而 Flutter 提供了一系列的工具和类来促进它们的实现。
+结果是一个模拟弹簧的动画，在屏幕上产生一个弹跳效果。从本质上讲，基于物理的动画为你提供了一个强大的机制，用于在你的应用程序中创造逼真和流畅的运动，而 Flutter 提供了一系列的工具和类来促进它们的实现。
 
 ### 英雄动画
 
-Flutter 中的 Hero 小部件充当不同屏幕之间共享元素过渡的渠道。例如，Hero 小部件可以对一个小部件从一个屏幕到另一个屏幕的过渡进行动画处理，包括图像、文本甚至容器等各种元素。这个小部件通过对共享元素进行动画处理来促进无缝过渡。
+Flutter 中的 Hero widget是充当不同屏幕之间跳转实现动画的工具。例如，从todo列表页点击某个todo之后跳转到todo的详情页的时候，可以用Hero widget来实现。当然不只是todo文本还包括图像、甚至容器等各种元素。
 
-Hero 小部件的一个关键方面是在起始屏幕和目标屏幕上都需要相同的标签。这个标签在识别正在进行过渡的共享元素方面至关重要。
+Hero widget的一个关键点是在起始屏幕和目标屏幕上都需要相同的*标签（tag）*。这个标签在识别正在进行过渡动画至关重要。
 
-考虑以下示例，该示例说明了如何利用 Hero 小部件在图像的缩略图和全屏视图之间实现平稳过渡。
+下面来看看如何实现从todo列表点击某个todo之后跳转到todo详情页的过渡动画。
 
-#### 缩略图页
+```dart
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final homeController = Get.find<HomeController>();
+
+    return Scaffold(
+      appBar: AppBar(
+        // 略
+      ),
+      body: Column(
+        children: [
+          // 略
+          Expanded(
+            flex: 1,
+            child: GetBuilder<HomeController>(
+                init: Get.find<HomeController>(),
+                builder: (controller) => ListView.separated(
+                      restorationId: 'sampleItemListView',
+                      itemCount: controller.todoList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final item = controller.todoList[index];
+                        return Hero( // 1
+                          tag: item.content,
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: ListRow(
+                                content: item.content,
+                                navigateTo: () async {
+                                  final result = await Navigator.of(context)
+                                      .push(MaterialPageRoute(
+                                    builder: (builder) {
+                                      return HeroAnimationPage( // 2
+                                        todoItem: item,
+                                      );
+                                    },
+                                  ));
+                                  // 略
+                                }),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Divider(),
+                    )),
+          ),
+          // 略
+        ],
+      ),
+    );
+  }
+
+  // 略
+}
+```
+
+解释如下：
+1. `Hero`: Hero动画需要两个Hero widget，一个是源（source）Hero，一个是目标（destination）Hero。这里的是源Hero。
+2. `HeroAnimationPage`：这是导航的路由目标页。在这个页面里包含了两个`Hero`的目标Hero。
+
+#### Hero动画目标页
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_todo/src/models/todo_model.dart';
+
+class HeroAnimationPage extends StatefulWidget {
+  const HeroAnimationPage({super.key, required this.todoItem});
+
+  final TodoItem todoItem;
+
+  @override
+  State<StatefulWidget> createState() => _HeroAnimationPageState();
+}
+
+class _HeroAnimationPageState extends State<HeroAnimationPage>
+    with SingleTickerProviderStateMixin {
+  @override
+  Widget build(BuildContext context) {
+    timeDilation = 3.0; // 1 
+
+    final content = widget.todoItem.content;
+    return Scaffold(
+      appBar: AppBar(
+        // 略
+      ),
+      body: Hero( // 2
+        tag: content,
+        child: Center(
+          child: Text(
+            content,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+解析如下：
+1. `tmeDilation`：用于调整动画的执行时间，这里延长动画时间可以更轻蹙的看到动画执行的过程
+2. `Hero`：这里的`Hero`是目标Hero widget。Hero动画需要两个`Hero`，一个是源Hero，一个是目标Hero。
+
+到这里，你对Hero动画已经有大概的了解了。要实现一个Hero动画需要
+1. 两个**tag**一样的Hero widget。
+2. 导航连接这里两个Hero widget所在的页面。
+3. 导航的`push`到下一个页面或者从目标页面`pop`回退到上一个页面的时候出发Hero动画。
+4. 在动画开始之后，flutter会自动给这个动画加一个`ReactTween`动画，显示在定义好的路由之上。也就是理由的两个页面之上。
+·
+
+### 隐性动画
+
+隐式动画是在Flutter中生成响应widget属性变化的简单动画的非常方便的工具。隐式动画无需深入研究复杂的动画控制器和补间，使您能够为小部件的属性设置动画，而无需操心动画的复杂细节。隐式动画有对于单一属性的widget，也有多个属性同时改变的widget。先来看一个简单的修改`opacity`值的隐式动画widget：`AnimatedOpacity`。
 
 ```dart
 import 'package:flutter/material.dart';
 
-class ThumbnailScreen extends StatelessWidget {
-  const ThumbnailScreen({super.key});
+class ImplicitAnimationPage extends StatefulWidget {
+  const ImplicitAnimationPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _ImplicitAnimationPageState();
+}
+
+class _ImplicitAnimationPageState extends State<ImplicitAnimationPage> {
+  double opacity = 0; // 1
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thumbnail Screen'),
-      ),
-      body: Column(
-        children: [
-          GridView.count(
-            crossAxisSpacing: 15,
-            crossAxisCount: 2,
-            children: [
-              Hero(
-                tag: 'image1',
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const FullScreenScreen(
-                           imageAsset: 'assets/white_puma.jpg',
-                          heroTag: 'image1',
-                        ),
-                      ),
-                    );
-                  },
-                  child: Image.asset('assets/white_puma.jpg'),
-                ),
-              ),
-              Hero(
-                tag: 'image2',
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const FullScreenScreen(
-                          imageAsset: 'assets/red_nike.jpg',
-                          heroTag: 'image2',
-                        ),
-                      ),
-                    );
-                  },
-                  child: Image.asset('assets/red_nike.jpg',
-                  ),
-                ),
-              ),
-            ],
-          ),
+        title: const Text("Implicit Animation"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                setState(() { // 2
+                  opacity = 1;
+                });
+              },
+              child: const Text("Start"))
         ],
       ),
-    );
-  }
-}
-```
-
-#### 详情页
-
-```dart
-class FullScreenScreen extends StatelessWidget {
-  final String imageAsset;
-  final String heroTag;
-
-  const FullScreenScreen({super.key, required this.imageAsset, required this.heroTag});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: Hero(
-          tag: heroTag,
-          child: Image.asset(imageAsset),
+      body: Container(
+        color: Colors.yellow,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: AnimatedOpacity(  // 3
+                duration: const Duration(seconds: 2), // 4
+                opacity: opacity,
+                child: Container(
+                    color: Colors.red,
+                    child: const Text(
+                      "Implicit Animation",
+                      style: TextStyle(fontSize: 30),
+                    )),
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -518,72 +598,106 @@ class FullScreenScreen extends StatelessWidget {
 }
 ```
 
-在`ThumbnailScreen`中，Hero widget 封装了图像 widget，每个都有一个独特的标签来区分共享元素。当用户与一个图像交互时，一个导航操作将他们引导到`FullScreenScreen`。
+解释如下：
+1. 这个需要在一个`StatefulWidget`里使用，动画组件会监听属性值状态的变化。
+2. `setState`给`opacity`赋新的值开始动画。
+3. 使用`AnimatedOpacity`组件来执行动画。还有其他的类似的使用`Animated`为前缀的动画组件。
+4. 动画组件需要`duration`属性的值来决定动画的执行时间。
 
-在`FullScreenScreen`中，图像被另一个 Hero widget 包裹，该 widget 具有与`ThumbnailScreen`中相应图像相同的标签。这个标签在图像从缩略图屏幕过渡到全屏显示时引导动画。此外，图像嵌套在一个手势探测器内，使用户能够在屏幕上的任何地方点击以返回到缩略图屏幕。
+`AnimatedOpacity`是对于一个属性实现动画的动画组件。对于多个属性同时动画的组件叫做`AnimatedContainer`。 类似于一个标准容器，但它具有额外的动画能力。它对诸如大小、颜色和形状等属性的变化进行动画处理。让我们来探讨一个示例，说明使用 AnimatedContainer 小部件在按下按钮时对颜色变化进行动画处理。
 
-![alt text](image-1.png)
-
-当用户在缩略图屏幕上点击一个图像时，Flutter 精心安排一个动画，将共享元素传送到全屏屏幕。在全屏屏幕中点击图像时，Flutter 进行一个动画，将共享元素返回到缩略图屏幕。Hero 小部件在实现屏幕之间无缝且迷人的过渡方面被证明是非常宝贵的，它在增强电子商务应用中的用户体验方面尤其有效。
-
-### 隐性动画
-
-隐式动画是在 Flutter 中生成响应小部件属性变化的简单动画的宝贵工具。隐式动画无需深入研究复杂的动画控制器和补间，使您能够为小部件的属性设置动画，而无需操心动画的复杂细节。隐式动画工具的一个主要例子是 AnimatedContainer 小部件。
-
-AnimatedContainer 小部件类似于标准容器，但它具有额外的动画能力。它对诸如大小、颜色和形状等属性的变化进行动画处理。让我们来探讨一个示例，说明使用 AnimatedContainer 小部件在按下按钮时对颜色变化进行动画处理。
 
 #### 隐性动画示例
 
 ```dart
-// Import required packages and libraries
-import 'package:flutter/material.dart';
+import 'dart:math';
 
-// Define the ImplicitAnimations widget
-class ImplicitAnimations extends StatefulWidget {
-  const ImplicitAnimations({Key? key}) : super(key: key);
-  @override
-  createState() => ImplicitAnimationsState();
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+double randomBorderRadius() {
+  return Random().nextDouble() * 64;
 }
 
-class ImplicitAnimationsState extends State<ImplicitAnimations> {
-  bool _isPressed = false;
+double randomMargin() {
+  return Random().nextDouble() * 64;
+}
 
-  void _togglePressed() {
-    setState(() {
-      _isPressed = !_isPressed;
-    });
+Color randomColor() {
+  return Color(0xFFFFFFFF & Random().nextInt(0xFFFFFFFF));
+}
+
+class ImplicitAnimationPage extends StatefulWidget {
+  const ImplicitAnimationPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _ImplicitAnimationPageState();
+}
+
+class _ImplicitAnimationPageState extends State<ImplicitAnimationPage> {
+  double opacity = 0;
+  //
+  Color color = Colors.white;
+  double radius = 0;
+  double margin = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    color = randomColor();
+    radius = randomBorderRadius();
+    margin = randomMargin();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Color and Position Change'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(seconds: 1),
-                height: 200.0,
-                width: 200.0,
-                margin: EdgeInsets.only(
-                  top: _isPressed ? 70.0 : 0.0,
-                ),
-                decoration: BoxDecoration(
-                  color: _isPressed ? Colors.blue : Colors.red,
-                  borderRadius: BorderRadius.circular(_isPressed ? 50.0 : 0.0),
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Implicit Animation"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  opacity = 1;
+                });
+              },
+              child: const Text("Start 1")),
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  color = randomColor();
+                  radius = randomBorderRadius();
+                  margin = randomMargin();
+                });
+              },
+              child: const Text("Start 2"))
+        ],
+      ),
+      body: Container(
+        color: Colors.yellow,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: AnimatedOpacity(
+                duration: const Duration(seconds: 2),
+                opacity: opacity,
+                child: AnimatedContainer( // 1
+                    duration: const Duration(milliseconds: 500),
+                    margin: EdgeInsets.all(margin),
+                    decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(radius)),
+                    child: const Text(
+                      "Implicit Animation",
+                      style: TextStyle(fontSize: 30),
+                    )),
               ),
-              const SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: _togglePressed,
-                child: const Text('ANIMATE'),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );
@@ -591,24 +705,18 @@ class ImplicitAnimationsState extends State<ImplicitAnimations> {
 }
 ```
 
-在这个例子中，隐式动画小部件包含一个\_isPressed 布尔变量和一个\_togglePressed()函数来切换它的值。小部件的状态类在\_togglePressed()中具有一个 setState()调用，以便在值改变时触发小部件树的重新构建。
-
-小部件的结构围绕着一个位于脚手架内的中心小部件。这个中心小部件容纳了一个包含两个主要元素的列：
-
-- 动画容器：这个小部件根据\_isPressed 值对其属性进行动画处理。在这个例子中，高度、宽度、边距、颜色和圆角的变化会被动画化。
-- 凸起按钮：这个按钮在被按下时启动动画，调用\_togglePressed()函数来切换\_is pressed。
+在这个例子中，`AnimatedContainer`会有圆角、背景色和`margin`三个属性的变化。在这里增加了三个随机值生成的方法，对于上述三个值每次点击按钮之后给`setState`三个随机的值。每次点击按钮都会看到不同的变化。
 
 隐式动画是一种将动画引入到你的 Flutter 应用程序的用户友好型方法，无需动画控制器和补间的复杂性。
 
-![alt text](image-2.png)
 
 ### 动画矢量图形
 
-Flutter 通过不同工具对动画矢量图形的支持，进一步体现了其创建复杂和动态动画的能力。基于矢量的图形在调整大小时能保持其质量。Flutter 使用不同工具来创建动画并将其导入到应用程序中。
+Flutter 通过不同工具对动画矢量图形的支持，进一步体现了其创建复杂和动态动画的能力。基于矢量的图形在调整大小时能保持图形质量。Flutter 使用不同工具来创建动画并将其导入到应用程序中。
 
 #### Rive
 
-Rive 提供了一种创建可跨平台部署的动画的途径，从移动端到网络端。Rive 动画被导出为 Rive 文件，这些文件可以通过 Rive 包集成到你的 Flutter 项目中。这个包还提供了一个 Rive 小部件来在你的应用程序中展示 Rive 动画。
+Rive 提供了一种创建可跨平台部署的动画的途径，从移动端到网络端。Rive 动画被导出为 Rive 文件，这些文件可以通过 Rive 包集成到你的 Flutter 项目中。这个包还提供了一个 Rive widget来在你的应用程序中展示 Rive 动画。
 
 让我们深入研究在 Flutter 应用程序中实现 Rive 的过程：
 
@@ -644,7 +752,7 @@ class RiveAnimations extends StatelessWidget {
 
 1. 使用 Rive 网站创建动画并以适当格式下载它。
 2. 将 Rive 包导入到你的 Flutter 项目中。
-3. 使用 RiveAnimation.asset 小部件，并提供你的 Rive 文件的路径。
+3. 使用 RiveAnimation.asset widget，并提供你的 Rive 文件的路径。
 
 可以使用 RiveAnimationController 类来控制动画，使你能够根据需要启动、停止和暂停动画。
 
@@ -699,6 +807,6 @@ Lottie 动画能轻松让你的应用生动起来。只需找到或创建一个�
 
 ### 总结一下
 
-动画在移动应用开发中起着关键作用，通过为应用注入活力和吸引力来增强用户体验。本文深入探讨了 Flutter 的动画能力，从其动画系统和基本类到基于物理的动画、自定义动画以及使用 Hero 小部件的高级动画过渡等先进技术。我们还讨论了隐式动画以及使用 Rive 和 Lottie 等包集成动画矢量图形。
+动画在移动应用开发中起着关键作用，通过为应用注入活力和吸引力来增强用户体验。本文深入探讨了 Flutter 的动画能力，从其动画系统和基本类到基于物理的动画、自定义动画以及英雄动画过渡等动画技术。我们还讨论了隐式动画以及使用 Rive 和 Lottie 等包集成动画矢量图形。
 
-通过利用这些资源，你可以进一步深入高级 Flutter 动画的世界，打造迷人且动态的用户界面，使你的移动应用脱颖而出。
+通过利用这些资源，你可以进一步深入高级 Flutter 动画的世界，打造更加符合用户体验的动态的用户界面，使你的移动应用脱颖而出。
