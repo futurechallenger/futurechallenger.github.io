@@ -203,7 +203,7 @@ result(title)
   }
 ```
 
-### 调用开发好的插件
+### 测试开发好的插件
 
 在\*example\`项目里调用刚刚开发好了的插件。
 
@@ -241,6 +241,41 @@ result(title)
 3.  在成功的返回了事件title之后setState，这样这个title才会显示出来。
 
 运行之后就会在日历中找到添加进去的事件。不过在android上需要先登录账户，所以没有成功添加。
+
+### 在另外一个项目中使用Plugin
+
+Plugin开发好了肯定不是在`example`目录跑一下就完成了。在正式的可以运行的项目里跑起来才对。
+
+直接在*pubspec.yaml*里添加依赖：
+```yaml
+dependencies:
+  # 略
+  calendar_plugin:
+    git:
+      url: https://github.com/futurechallenger/calendar_plugin.git
+      ref: main
+```
+
+之后执行：
+```bash
+flutter pub get
+```
+
+之后就可以在项目里使用这个Plugin了。
+
+### 发布你的Plugin
+
+开发出一款优秀的Plugin之后就可以给其他的开发者用了。这需要发布到pub.dev上。代码已经测试过，检查文档完整，详细的说明了如何使用这个Plugin之后就可以开始发布了。
+
+首先使用dry-run模式分析一下Plugin看有没有什么其他问题：
+```bash
+flutter pub publish --dry-run
+``` 
+
+然后就可以发布到pub.dev上了：
+```bash
+flutter pub publish
+```
 
 ### 最后
 
